@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+{% block title %}Acciones{% endblock %}
+{% block contenido %}
+<div class="container">
+
+    <div class="row">
+        <div class="table-responsive"> 
+            <table class="table table-bordered table-hover table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Dirección IP</th>
+                        <th class="text-center">Puerto</th>
+                        <th class="text-center">Descripción</th>
+                        <th></th>
+                        <th class="text-center">Editar</th>
+                    </tr>
+                </thead>
+            {% for equipo in raspberrys %}
+                <tbody>  
+                    <tr>
+                        <td>{{equipo.Nombre}}</td>
+                        <td class="text-center">{{equipo.IP}}</td>
+                        <td class="text-center">{{equipo.Puerto}}</td>
+                        <td class="text-center">{{equipo.Descripcion}}</td>
+                        <td class="text-center"><button type="button" class="btn btn-success btn-sm" onclick="reles('{{equipo.Nombre}}','{{equipo.IP}}')" id="{{equipo.id}}">Relevadores</button></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-outline-primary border-0" id="{{equipo.IP}}" onclick="editarRelay('{{equipo.IP}}','{{equipo.Nombre}}')"><i class="fas fa-edit" style="font-size:20px;"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            {% endfor %}
+            </table>
+          </div> 
+    </div>
+</div>
+
+<!-- Modal Relevadores --> 
+
+<div class="modal fade" id="modal_reles" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header d-flex  justify-content-between">
+                <div class="">
+                    <h5 class="modal-title">Relevadores de: <span class="text-danger" id="tituloModal"></span></h5>
+                </div>
+                <div class="">
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"><i class="fas fa-undo-alt"></i>&nbsp;&nbsp;Regresar</button>
+                </div>
+        </div>
+        <div class="modal-body" id="bodyModal">
+            <div id="cargando_reles" class="d-flex flex-column" style="display: block;">
+                <div class="text-center">   
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                </div>
+                <div class=" text-center mt-2">
+                    <h5 class="text-danger">Cargando, un momento...</h5>
+                </div>
+            </div>
+            <div id="tabla_reles" style="display: none;">
+                <table class="table table-bordered table-hover table-sm">
+                    <thead class="table-dark">
+                         <tr class="d-flex">
+                        <th class="text-center col-4">Nombre</th>
+                        <th class="text-center col-2">Pin</th>
+                        <th class="text-center col-3">Estatus</th>
+                        <th class="text-center col-3 text-sm-sm">Tareas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablebodylol">
+        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+            
+        </div> 
+      </div>
+    </div>
+</div>
+
+<!--  Modal editar relevador -->
+<div class="modal fade" id="modal_editar_reles" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-center">
+          <h5 class="modal-title">Editar relevadores de: <span class="text-danger" id="titulo_editar"></span></h5>
+        </div>
+        <div class="modal-body" id="bodyModal">
+            <div id="cargando_editar" class="" style="display: none;">
+                <div class="text-center">   
+                <i class="fas fa-spinner fa-spin fa-3x"></i>
+                </div>
+                <div class=" text-center mt-2">
+                    <h5 class="text-danger">Cargando, un momento...</h5>
+                </div>
+            </div>
+            <div  id = "editar_select" style="display: none;" >
+                <div class="d-flex flex-column" > 
+                    <div class="">
+                    <!-- <h6 class="text-primary text-center">Selecciona un relevador a editar</h6> -->
+                        <div class="d-flex justify-content-center">
+                            <div id="select_relay" class="col-5">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <div class="d-flex" >
+                            <div class="input-group input-group-sm col-8">
+                                <div class="input-group-prepend ">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Nombre:</span>
+                                </div>
+                                <input type="text"  id="nombre_relay" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Nombre">
+                            </div>
+                            <div class="input-group input-group-sm col-4">
+                                <div class="input-group-prepend ">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Pin:</span>
+                                </div>
+                                <input type="text"  id="pin_relay" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Pin">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+            <div>
+                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"><i class="fas fa-undo-alt"></i>&nbsp;&nbsp;Regresar</button>
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-primary" onclick="guardar_relay()"><i class="fas fa-check-circle"></i>&nbsp;&nbsp;Aceptar</button>
+                <input type="text" style="display: none;" id="ip_edit_reles"> 
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+function makePostRequest(data) {
+    queryObj = { name: data };
+    axios.post('/test', queryObj).then(
+        (response) => {
+            var result = response.data;
+            console.log(result);
+        },
+        (error) => {
+            console.log(error);
+        }
+    );
+}
+
+function m_relay(dato){
+    var array = dato.id.split("_");
+    queryObj = { name: array[0],
+                 relay: array[1],
+                 pin: array[2],
+                 codigo: 'change_relay',
+                 estatus: dato.checked };
+
+    //console.log(queryObj);
+
+    axios.post('/change_relay', queryObj).then(
+          (response) => {
+             // var result = response.data;
+            // console.log(result);
+            Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: 'Cambio realizado con exito',
+                  showConfirmButton: false,
+                  timer: 1250,
+                });
+          },
+          (error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Ocurrio un error',
+              //text: '',
+            });
+              console.log(error);
+          }
+      );
+}
+
+function reles(data, ip){
+    //document.getElementById('tablebodylol').innerHTML = "";
+    document.getElementById('cargando_reles').style.display = 'block';
+    document.getElementById('cargando_reles').className = 'd-flex flex-column';
+    document.getElementById('tabla_reles').style.display = 'none';
+    document.getElementById("tituloModal").innerText = data;
+    $('#modal_reles').modal({backdrop: 'static', keyboard: false});  
+    queryObj = {    codigo: 'estatus_relay',
+                    ip: ip,
+                 };
+    //console.log(data);
+    axios.post('/reles', queryObj).then(
+        (response) => {
+          var result = response.data;
+         // console.log(result);
+         //  for(var k in result) {
+           //     console.log(k, result[k]);
+           //    }
+        
+        document.getElementById("cargando_reles").style.display = 'none';
+
+        let json = response.data;
+        
+        let tableText = "";
+            for(var k in result) {
+                var array = result[k].split(",");
+                tableText += "<tr class='d-flex'>";
+                tableText += "<td class='col-4'>"+k+"</td>"; //nombre del pin
+                tableText += "<td class='text-center col-2'>"+array[0]+"</td>"; //pin
+                tableText += '<td class="d-flex justify-content-center col-3"><div class="">'+
+                                    '<div class="onoffswitch">';
+                if(array[1] == 'True'){ //estado del pin
+                    tableText += '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="'+data+'_'+k+'_'+array[0]+'" onchange="m_relay(this)" tabindex="0" checked="on">';
+                }
+                else{
+                    tableText += '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="'+data+'_'+k+'_'+array[0]+'" onchange="m_relay(this)" tabindex="0">';
+                }
+                tableText += '<label class="onoffswitch-label" for="'+data+'_'+k+'_'+array[0]+'">'+
+                                            '<span class="onoffswitch-inner"></span>'+
+                                            '<span class="onoffswitch-switch"></span>'+
+                                        '</label>'+
+                                    '</div>'+
+                                '</div></td>';
+                tableText += '<td class="text-center col-3"><button type="button" class="btn  btn-outline-primary border-0"><i class="far fa-calendar-alt" style="font-size:20px;"></i></button></td>';
+                
+               // tableText += "<td>"+result[k]+"</td>";
+                tableText += "</tr>";
+            }
+        document.getElementById('tablebodylol').innerHTML = tableText;
+        document.getElementById('tabla_reles').style.display = 'block';
+        document.getElementById('cargando_reles').className = '';
+
+
+        //console.log(tableText);
+        },
+        (error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Ocurrio un error',
+              //text: '',
+            });
+            console.log(error);
+        }
+    );
+    //$('#modal_reles').modal("show");
+    }
+
+    function guardar_relay(){
+        let ip = document.getElementById("ip_edit_reles").value; //ip oculto en edit reles
+        let rele_ant = document.getElementById("select_pin").value; //nombre y pin
+        let array = rele_ant.split("_");
+        let nombre_nuevo = document.getElementById('nombre_relay').value; 
+        let pin_nuevo = document.getElementById('pin_relay').value; 
+       // console.log(ip, array[0], array[1]);
+       let ban = 0; 
+       if(rele_ant != ""){
+            if(nombre_nuevo == '' || pin_nuevo == ''){
+                error('Llena todos los campos');
+                ban = 1;
+            }
+            else{
+                ban = 0;
+            }
+        }
+        else{
+          error('Selecciona un relevador');
+            ban = 1;
+        }
+        console.log(ban);
+        if(ban == 0){
+            queryObj = {  codigo : 'cambio_pin', //codigo de raspberry
+                        ip: ip,
+                        name_ant: array[0], //nombre del pin seleccionado
+                        pin_ant: array[1], //numero de pin seleccionado
+                        name_new: nombre_nuevo,
+                        pin_new: pin_nuevo,
+                    };
+            axios.post('/reles/editar', queryObj).then(
+                (response) => {
+                    Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Cambio realizado con exito',
+                    showConfirmButton: false,
+                    timer: 1250,
+                    });
+                },
+                (error) => {
+                    error('Ocurrio un error');
+                    console.log(error);
+                }
+            );
+        }
+      
+    }
+
+    function relaypin(item){
+        if(item.value != ""){
+            var array = item.value.split("_"); //nombre y pin
+            document.getElementById("nombre_relay").value = array[0];
+            document.getElementById("pin_relay").value = array[1];
+        }
+        else{
+            document.getElementById("nombre_relay").value = '';
+            document.getElementById("pin_relay").value = '';
+        }
+    }
+    
+    function editarRelay(ip, name){
+        document.getElementById('cargando_editar').style.display = 'block';
+        document.getElementById('cargando_editar').className = 'd-flex flex-column';
+        document.getElementById('editar_select').style.display = 'none';
+        document.getElementById("nombre_relay").value = '';
+        document.getElementById("pin_relay").value = '';
+        document.getElementById("titulo_editar").innerText = name;
+        document.getElementById("ip_edit_reles").value = ip;
+        $('#modal_editar_reles').modal({backdrop: 'static', keyboard: false});
+        queryObj = { codigo: 'estatus_relay', //codigo para retornar los relevadores
+                     ip: ip,
+                    };
+        axios.post('/reles', queryObj).then(
+            (response) => {
+              //  console.log(response.data);
+                document.getElementById("cargando_editar").style.display = 'none';
+                var json = response.data;
+                let lista = ""; //componente select
+                lista = '<select class="form-control" onchange="relaypin(this)" id="select_pin">';
+                lista += '<option value="" class="text-center">Elige un relay</option>'
+                for(var k in json) {
+                    var array = json[k].split(",");
+                    lista += '<option value="'+k+'_'+array[0]+'">'+k+'</option>';
+                }
+                lista += '</select>';
+                document.getElementById('select_relay').innerHTML = lista;
+                document.getElementById('editar_select').style.display = 'block';
+                document.getElementById('cargando_editar').className = '';    
+            },
+            (error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ocurrio un error',
+                    //text: '',
+                });
+                console.log(error);
+            }
+        );
+    }
+    
+    function editarRelay2(item){ //funcion sin uso
+        
+        queryObj = { codigo: 'estatus_relay',
+                     ip: item,
+                    };
+
+        axios.post('/reles', queryObj).then(
+            (response) => {
+                //console.log(response.data);
+                var result = response.data;
+                document.getElementById("cargando_editar").style.display = 'none';
+                let tableText = "";
+                for(var k in result){
+                    var array = result[k].split(",");
+                   // tableText += "<tr class='d-flex'>";
+                  //  tableText += "<td class='col-4'>"+k+"</td>"; //nombre
+                  //  tableText += "<td class='col-4'>"+array[0]+"</td>";
+                  //  tableText += "</tr>";
+                tableText += "<div class='d-flex flex-row justify-content-center'>";
+                tableText +=  '<div class="col-md-8">'+
+                    '<div class="input-group input-group-sm mb-3">'+
+                    '<div class="input-group-prepend">'+
+                    '<span class="input-group-text">Nombre: </span>'+
+                    '</div>'+
+                    '<input type="text"  class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="'+k+'">'+
+                    '</div>'+
+                    '</div>'+
+                    '<div class="col-md-4">'+
+                    '<div class="input-group input-group-sm mb-3">'+
+                    '<div class="input-group-prepend">'+
+                    '<span class="input-group-text" id="inputGroup-sizing-sm">Pin: </span>'+
+                    '</div>'+
+                    '<input type="text"  class="form-control" aria-label="Small"aria-describedby="inputGroup-sizing-sm" value="'+array[0]+'">'+
+                    '</div>'+
+                    '</div>';
+                tableText += '</div>'
+                }
+                document.getElementById('inputs_reles').innerHTML = tableText;
+                document.getElementById('inputs_reles').style.display = 'block';
+            },
+            (error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ocurrio un error',
+                    //text: '',
+                });
+                console.log(error);
+            }
+        );
+    }
+
+    function error(text){
+        Swal.fire({
+                icon: 'error',
+                title:  text,
+                //text: '',
+        });
+    }
+
+</script>
+
+{% endblock %}
