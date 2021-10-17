@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Configuracion{% endblock %}
+{% block contenido %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <br>
+            <br>
+            <h5 class="text-center">Seleccione un dispositivo</h5>
+                <div class="list-group">
+                    <!-- <a class="list-group-item" href="#">Equipo 1</a>
+                    <a class="list-group-item" href="#">Equipo 2</a> -->
+                    {% for eq in equipos %}
+                        {% if raspberry.Nombre == eq.Nombre %}
+                            <a class="list-group-item active" href="{{url_for("configuracion",id=eq.id)}}">{{eq.Nombre}}</a>
+                        {% else %}
+                            <a class="list-group-item" href="{{url_for("configuracion",id=eq.id)}}">{{eq.Nombre}}</a>
+                        {% endif%}
+                    {% endfor %}
+                </div>
+                <div class="text-center"><a class="btn btn-success" href="{{url_for('raspberrynew')}}" role="button">Agregar equipo</a></div>
+        </div>
+        <div class="col-md-10">
+            <h3 class="text-center">Raspberry Pi: <span class="text-danger">{{ raspberry.Nombre }}</span></span></h3>
+            <br>
+            <div class="panel panel-default">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Nombre</th>
+                            <th class="text-center">IP</th>
+                            <th class="text-center">Descripción</th>
+                            <th class="text-center">Estatus</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ raspberry.Nombre }}</td>
+                            <td>{{ raspberry.IP }}</td>
+                            <td>{{ raspberry.Descripcion }}</td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider round"></span>
+                                  </label>
+                            </td>
+                            <td class="text-center">{% if current_user.is_authenticated and current_user.is_admin()  %}
+                                <a href="{{url_for("raspberryedit",id=raspberry.id)}}"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
+                                {% endif %}
+                            </td>
+                            <td class="text-center"><a class="text-danger" href="{{url_for("raspberrydelete",id=raspberry.id)}}"><span class="glyphicon glyphicon-trash text-danger"></span>Eliminar</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
