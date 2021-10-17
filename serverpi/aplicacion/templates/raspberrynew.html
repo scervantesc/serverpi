@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Dispositivos{% endblock %}
+{% block contenido %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 pt-md-5 mt-md-4">
+      <div class="form-group">
+        <select class="form-control" id="select" onchange="dispositivo(this)">
+          <option value="#" class="text-center">Seleccione un dispositivo</option>
+          {% for eq in equipos %}
+            <option value="{{url_for('configuracion',id=eq.id)}}">{{eq.Nombre}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="d-flex flex-column my-sm-2">
+        {% if raspberry != None %}
+        <div class=" my-2">
+          <div class="text-center"><a class="btn btn-sm btn-block btn-success" href="{{url_for('raspberrynew')}}" role="button"><i class="fas fa-plus-circle"></i>&nbsp;&nbsp;Agregar equipo</a></div>
+        </div>
+          <div class=" mb-2">
+            <div class="text-center"><button type="button" class="btn btn-sm btn-block btn-primary" onclick="actualizar('{{raspberry.Nombre}}')"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp;Actualizar Raspberry</button></div>
+          </div>
+          <div class="">
+            <div class="text-center"><a href="{{url_for("raspberrydelete",id=raspberry.id)}}" type="button" class="btn btn-sm btn-block btn-danger"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Eliminar dispositivo</a></div>
+          </div>
+          {% endif %}
+      </div>
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-4">
+      <div class="d-flex flex-column mb-4 mt-2 mt-md-0">
+        {% if not ban %}
+          <h3 class="form-signin-heading text-center">Agregar nueva raspberry</h3>
+        {% else %}
+          <h3 class="form-signin-heading text-center">Editar: <span class="text-danger">{{raspberry.Nombre}}</span></h3>
+        {% endif%}
+        
+        {% for field, errors in form.errors.items() %}
+          <div class="alert alert-danger">
+            {{ form[field].label }} {{ ', '.join(errors) }}
+          </div>
+        {% endfor %}
+      </div>
+      <form class="form-horizontal" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          {{ form.csrf_token }}
+          {{form.Nombre.label() }}{{form.Nombre(size="100",class="form-control", autofocus="on")}}<br/>
+        </div>
+        {% if not ban %}
+          <div class="form-group mb-4">
+            <div class="d-flex">
+              <div class=""><label>Datos por defecto</label></div>
+              <div class="ml-4" style="margin-bottom: 7px; margin-left: -20px;">
+                <div class="onoffswitch">
+                  <input type="checkbox" class="onoffswitch-checkbox" id="defecto" tabindex="0" onchange="pordefecto(this)" checked="true">
+                  <label class="onoffswitch-label" for="defecto">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </div>
+            </div> 
+          </div>
+        {% else %}
+          <div class="form-group mb-4">
+            <div class="d-flex ">
+              <div class=""><label>Cambiar IP y puerto</label></div>
+              <div class="ml-4">
+                <div class="onoffswitch">
+                  <input type="checkbox" name="{{raspberry.Nombre}}" class="onoffswitch-checkbox" id="edit_{{raspberry.Nombre}}" tabindex="0" onchange="cambio_ip(this)">
+                  <label class="onoffswitch-label" for="edit_{{raspberry.Nombre}}">
+                    <span class="onoffswitch-inner"></span>
+                    <span class="onoffswitch-switch"></span>
+                  </label>
+                </div>
+              </div>
+            </div> 
+          </div>
+        {% endif %}
+        <div class="form-group">
+          {% if not ban %}
+            {{form.IP.label() }}{{form.IP(size="100",class="form-control", pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$", placeholder="Ejemplo: 192.168.100.100")}}
+          {% else %}
+            {{form.IP.label() }}{{form.IP(size="100",class="form-control", disabled="on",id="ip_"+raspberry.Nombre, pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$", placeholder="Ejemplo: 192.168.100.100")}}
+          {% endif %}
+          <br/>
+        </div>
+        <div class="form-group">
+          {% if not ban %}
+            {{form.Puerto.label() }}{{form.Puerto(size="100",class="form-control")}}
+          {% else %}
+            {{form.Puerto.label() }}{{form.Puerto(size="100",class="form-control", disabled="on", id="puerto_"+raspberry.Nombre)}}
+          {% endif %}
+          <br/>
+        </div>
+        <div class="form-group">
+          {{form.Descripcion.label() }}{{form.Descripcion(size="100",class="form-control")}}<br/>
+        </div>
+        {{form.submit(class="btn btn-success btn-block")}}
+      </form>
+      <br>
+      <br>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Actualizar ip y puerto  --> 
+<div class="modal fade" id="modal_datos" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" >
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-center">
+        <h5 class="modal-title text-center" id="exampleModalLongTitle">Actualizar direccion IP y puerto</h5>
+     <!--   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button> -->
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-column flex-md-row justify-content-center">
+          <div class="col-md-6">
+            <div class="input-group input-group-sm mb-3">
+              <div class="input-group-prepend ">
+                <span class="input-group-text" id="inputGroup-sizing-sm">IP actual:</span>
+              </div>
+              <input type="text"  id="ip_actual" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"  name="msg" pattern="^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$" placeholder="Ejemplo: 192.168.100.100">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group input-group-sm mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Puerto actual:</span>
+              </div>
+              <input type="text"  id="puerto_actual"class="form-control" aria-label="Small"  name="msg" placeholder="Puerto actual" aria-describedby="inputGroup-sizing-sm">
+            </div>
+          </div>
+        </div>
+        <div class="d-flex flex-column flex-md-row justify-content-center">
+          <div class="col-md-6">
+            <div class="input-group input-group-sm mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-sm">IP nueva:</span>
+              </div>
+              <input type="text"  id="ip_nuevo" class="form-control" aria-label="Small" placeholder="Ejemplo: 192.168.100.100" aria-describedby="inputGroup-sizing-sm">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group input-group-sm mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-sm">Puerto nuevo:</span>
+              </div>
+              <input type="text"  id="puerto_nuevo" class="form-control" aria-label="Small" placeholder="Puerto nuevo" aria-describedby="inputGroup-sizing-sm">
+            </div>
+          </div>
+        </div>
+        <div class="row" id="proceso" style="display:none;">
+          <div>
+            <h5 class="text-center text-danger">Procesando, un momento por favor...</h5>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer d-flex justify-content-around justify-content-md-center">
+        <div class="">
+          <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Cancelar</button>
+        </div>
+        <div class=""> 
+          <button type="button" class="btn btn-sm btn-success" onclick="actualizar_ip('{{raspberry.Nombre}}')">Actualizar</button>
+        </div>    
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  
+  window.onload = function() {
+    if(document.getElementById("defecto").checked == true){
+      document.getElementById("IP").value = '192.168.100.101';
+      document.getElementById("Puerto").value = '6000';
+    }
+  }
+
+  function dispositivo(item){
+    console.log(item.value)
+    location.href = item.value;
+  }
+
+  function cambio_ip(item){
+    //console.log(item);
+    document.getElementById("ip_"+item.name).disabled = !item.checked;
+    document.getElementById("puerto_"+item.name).disabled = !item.checked;
+  }
+
+  function pordefecto(item){
+    if(item.checked == true){
+      document.getElementById("IP").value = '192.168.100.101';
+      document.getElementById("Puerto").value = '6000';
+      }
+      else{
+      document.getElementById("IP").value = '';
+      document.getElementById("Puerto").value = '';
+      }
+  }
+
+  function actualizar(name){
+    document.getElementById("ip_nuevo").value = '';
+    document.getElementById("puerto_nuevo").value = '';
+    document.getElementById("ip_actual").value = document.getElementById("ip_"+name).value;
+    document.getElementById("puerto_actual").value = document.getElementById("puerto_"+name).value;
+    $('#modal_datos').modal("show");
+  }
+  function actualizar_ip(name){
+    if(document.getElementById("ip_nuevo").value != '' && document.getElementById("puerto_nuevo").value != ''){
+      queryObj = { codigo: 'ip',
+                   nombre: name,
+                   ip_a: document.getElementById("ip_actual").value,
+                   puerto_a: document.getElementById("puerto_actual").value,
+                   ip_n: document.getElementById("ip_nuevo").value,
+                   puerto_n: document.getElementById("puerto_nuevo").value };
+      //console.log(queryObj);
+      document.getElementById("proceso").style.display = 'block';
+      axios.post('/actualizar_parametros', queryObj).then(
+          (response) => {
+             var result = response.data;
+              //console.log(response.data.estatus)
+              if(result .estatus == 'ok'){
+               //console.log('cambio realizado');
+                document.getElementById("ip_"+name).value = document.getElementById("ip_nuevo").value;
+                document.getElementById("puerto_"+name).value = document.getElementById("puerto_nuevo").value;
+                document.getElementById("proceso").style.display = "none";
+                Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: 'Cambio realizado con exito',
+                  showConfirmButton: false,
+                  timer: 1000,
+                });
+                $('#modal_datos').modal('hide');
+              }
+          },
+          (error) => {
+            document.getElementById("proceso").style.display = 'none';
+            Swal.fire({
+              icon: 'error',
+              title: 'Ocurrio un error',
+              //text: '',
+            });
+              console.log(error);
+          }
+      );
+    }
+  }
+</script>
+
+{% endblock %}
