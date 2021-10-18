@@ -5,6 +5,7 @@ Flask-Cors
 Flask-Login
 Flask-Script
 Flask-SQLAlchemy
+Flask-FontAwesome
 Flask-WTF
 Jinja2
 SQLAlchemy
