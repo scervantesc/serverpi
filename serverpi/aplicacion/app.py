@@ -204,6 +204,8 @@ def actualizar_parametros():
             rasp.Puerto = puerto_n
             db.session.commit()
         #print('connecting to {} port {}'.format(*server_address))
+    else: 
+        dato = 'error'
     return jsonify({"estatus" : format(dato) })
     #return jsonify({"codigo" : request.json['codigo']
      #               ,"ip actual" : request.json['ip_a'],
