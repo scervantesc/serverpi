@@ -261,7 +261,6 @@ function reles(data, ip){
         let array = rele_ant.split("_");
         let nombre_nuevo = document.getElementById('nombre_relay').value; 
         let pin_nuevo = document.getElementById('pin_relay').value; 
-       // console.log(ip, array[0], array[1]);
        let ban = 0; 
        if(rele_ant != ""){
             if(nombre_nuevo == '' || pin_nuevo == ''){
@@ -276,7 +275,6 @@ function reles(data, ip){
           error('Selecciona un relevador');
             ban = 1;
         }
-        console.log(ban);
         if(ban == 0){
             queryObj = {  codigo : 'cambio_pin', //codigo de raspberry
                         ip: ip,
@@ -287,13 +285,19 @@ function reles(data, ip){
                     };
             axios.post('/reles/editar', queryObj).then(
                 (response) => {
-                    Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'Cambio realizado con exito',
-                    showConfirmButton: false,
-                    timer: 1250,
-                    });
+                  //  console.log(response.data);
+                    if(response.data == 'ok'){
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Cambio realizado con exito',
+                            showConfirmButton: false,
+                            timer: 1250,
+                        });
+                    }
+                    else{
+                        error('El pin ya esta en uso');
+                    }
                 },
                 (error) => {
                     error('Ocurrio un error');

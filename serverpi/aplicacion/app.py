@@ -143,7 +143,7 @@ def editarreles():
             dato = sock.recv(1024)
             #data = data.decode("utf-8")
             #dato = json.loads(data)
-            if dato == 'ok':
+            if dato == 'ok' or dato == 'error':
                 sock.sendall('')
         finally:
             sock.close()
