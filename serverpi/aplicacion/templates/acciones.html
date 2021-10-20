@@ -141,7 +141,7 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
-function makePostRequest(data) {
+function makePostRequest(data) { //funcion test
     queryObj = { name: data };
     axios.post('/test', queryObj).then(
         (response) => {
@@ -154,20 +154,15 @@ function makePostRequest(data) {
     );
 }
 
-function m_relay(dato){
+function m_relay(dato){ //cambia el estado del relay
     var array = dato.id.split("_");
     queryObj = { name: array[0],
                  relay: array[1],
                  pin: array[2],
                  codigo: 'change_relay',
                  estatus: dato.checked };
-
-    //console.log(queryObj);
-
     axios.post('/change_relay', queryObj).then(
           (response) => {
-             // var result = response.data;
-            // console.log(result);
             Swal.fire({
                   position: 'center',
                   icon: 'success',
@@ -177,18 +172,13 @@ function m_relay(dato){
                 });
           },
           (error) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Ocurrio un error',
-              //text: '',
-            });
-              console.log(error);
+                error('Ocurrio un error')
+                console.log(error);
           }
       );
 }
 
-function reles(data, ip){
-    //document.getElementById('tablebodylol').innerHTML = "";
+function reles(data, ip){ //consulta el estado de los relevadores 
     document.getElementById('cargando_reles').style.display = 'block';
     document.getElementById('cargando_reles').className = 'd-flex flex-column';
     document.getElementById('tabla_reles').style.display = 'none';
@@ -197,7 +187,6 @@ function reles(data, ip){
     queryObj = {    codigo: 'estatus_relay',
                     ip: ip,
                  };
-    //console.log(data);
     axios.post('/reles', queryObj).then(
         (response) => {
           var result = response.data;
@@ -205,11 +194,8 @@ function reles(data, ip){
          //  for(var k in result) {
            //     console.log(k, result[k]);
            //    }
-        
         document.getElementById("cargando_reles").style.display = 'none';
-
         let json = response.data;
-        
         let tableText = "";
             for(var k in result) {
                 var array = result[k].split(",");
@@ -231,30 +217,20 @@ function reles(data, ip){
                                     '</div>'+
                                 '</div></td>';
                 tableText += '<td class="text-center col-3"><button type="button" class="btn  btn-outline-primary border-0"><i class="far fa-calendar-alt" style="font-size:20px;"></i></button></td>';
-                
-               // tableText += "<td>"+result[k]+"</td>";
                 tableText += "</tr>";
             }
         document.getElementById('tablebodylol').innerHTML = tableText;
         document.getElementById('tabla_reles').style.display = 'block';
         document.getElementById('cargando_reles').className = '';
-
-
-        //console.log(tableText);
         },
         (error) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Ocurrio un error',
-              //text: '',
-            });
+            error('Ocurrio un error');
             console.log(error);
         }
     );
-    //$('#modal_reles').modal("show");
-    }
+}
 
-    function guardar_relay(){
+    function guardar_relay(){ //editamos nombre y/o pin relevador
         let ip = document.getElementById("ip_edit_reles").value; //ip oculto en edit reles
         let rele_ant = document.getElementById("select_pin").value; //nombre y pin
         let array = rele_ant.split("_");
@@ -284,8 +260,12 @@ function reles(data, ip){
                     };
             axios.post('/reles/editar', queryObj).then(
                 (response) => {
-                  //  console.log(response.data);
-                    if(response.data == 'ok'){
+                    //console.log(response.data);
+                    if(response.data == 'error'){
+                        error('El pin ya esta en uso');
+                    }
+                    else{
+                        $('#modal_editar_reles').modal('hide');
                         Swal.fire({
                             position: 'center',
                             icon: 'success',
@@ -293,9 +273,6 @@ function reles(data, ip){
                             showConfirmButton: false,
                             timer: 1250,
                         });
-                    }
-                    else{
-                        error('El pin ya esta en uso');
                     }
                 },
                 (error) => {
@@ -307,7 +284,7 @@ function reles(data, ip){
       
     }
 
-    function relaypin(item){
+    function relaypin(item){ //pone en el input el rele seleccionado
         if(item.value != ""){
             var array = item.value.split("_"); //nombre y pin
             document.getElementById("nombre_relay").value = array[0];
@@ -319,7 +296,7 @@ function reles(data, ip){
         }
     }
     
-    function editarRelay(ip, name){
+    function editarRelay(ip, name){ //consulta los reles y abre el modal para editar reles
         document.getElementById('cargando_editar').style.display = 'block';
         document.getElementById('cargando_editar').className = 'd-flex flex-column';
         document.getElementById('editar_select').style.display = 'none';
@@ -333,7 +310,6 @@ function reles(data, ip){
                     };
         axios.post('/reles', queryObj).then(
             (response) => {
-              //  console.log(response.data);
                 document.getElementById("cargando_editar").style.display = 'none';
                 var json = response.data;
                 let lista = ""; //componente select
