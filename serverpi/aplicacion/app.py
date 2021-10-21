@@ -72,6 +72,42 @@ def test():
 def index():
     return render_template('index.html')
 
+# Comandos
+@app.route('/comandos')
+@login_required
+def comandos():
+    from aplicacion.models import Equipo
+    equipos = Equipo.query.all()
+    return render_template('comandos.html', equipos=equipos)
+
+#Cliente SSH desde front
+@app.route('/paramiko', methods=['POST'])
+@login_required
+def paramiko():
+    import paramiko
+    #from aplicacion.models import Equipo
+    import json
+    
+    #raspberry = Equipo.query.filter_by(IP=request.json['ip'])
+    
+    # Inicia un cliente SSH
+    ssh_client = paramiko.SSHClient()
+    # Establecer política por defecto para localizar la llave del host localmente
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # Conectarse
+    ssh_client.connect(request.json['ip'], 22, 'pi', 'zero123')
+    comando = 'sudo '+request.json['comando']
+    # Ejecutar un comando de forma remota capturando entrada, salida y error estándar
+    entrada, salida, error = ssh_client.exec_command(comando)
+    # Mostrar la salida estándar en pantalla
+    dato = salida.read()
+    print(dato)
+    # Cerrar la conexión
+    ssh_client.close()
+    if request.json['comando'] == 'reboot':
+        return 'ok'
+    return format(dato)
+    
 #cambio rele manual
 @app.route('/change_relay', methods=['POST'])
 @login_required

@@ -6,13 +6,12 @@
       <ul class="navbar-nav d-flex flex-row-reverse">
         {% if current_user.is_authenticated  %}
           <li class="nav-item" >
-            <a class="nav-link text-light font-weight-bold px-1" href="{{url_for('configuracion')}}"><i class="fas fa-microchip "></i>&nbsp;Dispositivos</a>
+            <a class="nav-link text-light font-weight-bold px-1" href="{{url_for('configuracion')}}"><i class="fas fa-microchip "></i>&nbsp;<small class="" >Dispositivos</small></a>
           </li>
           <li class="nav-item" >
-            <a class="nav-link text-light font-weight-bold px-1" href="{{url_for('acciones')}}"><i class="fas fa-sliders-h"></i>&nbsp;Acciones</a>
-          </li>
+            <a class="nav-link text-light font-weight-bold px-1" href="{{url_for('acciones')}}"><i class="fas fa-sliders-h"></i>&nbsp;<small class="" >Acciones</small></a></li>
           <li class="nav-item" >
-            <a class="nav-link text-light font-weight-bold px-1" href="/"><i class="fas fa-home"></i>&nbsp;Inicio</a>
+            <a class="nav-link text-light font-weight-bold px-1" href="/comandos"><i class="fas fa-terminal"></i>&nbsp;<small class="" >Comandos</small></a>
          </li>
         {% endif %}
       </ul>
@@ -24,14 +23,14 @@
         <ul class="navbar-nav d-flex flex-row-reverse">
         {% if current_user.is_authenticated %}
           <li class="nav-item" >
-           <a class="nav-link text-light font-weight-bold px-1 " href="/logout"> {{ current_user.username}} (Salir)</a>
+           <a class="nav-link text-light font-weight-bold px-1 " href="/logout"><small>{{ current_user.username}} (Salir)</small></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-light font-weight-bold px-1" href="/perfil/{{ current_user.username}}"><i class="fas fa-user"></i>&nbsp;Perfil</a>
+            <a class="nav-link text-light font-weight-bold px-1" href="/perfil/{{ current_user.username}}"><i class="fas fa-user"></i>&nbsp;<small class="" >Perfil</small></a>
            </li>
         {% else %}
           <li class="nav-item" >
-            <a class="nav-link text-light font-weight-bold px-1" href="/login">ACCEDER</a>
+            <a class="nav-link text-light font-weight-bold px-1" href="/login"><i class="fas fa-sign-in-alt"></i>&nbsp;<small class="" >Acceder</small></a>
           <!-- <a class="navbar-brand " href="/registro">Registro</a> -->
         {% endif %}
         </ul>
