@@ -25,8 +25,6 @@ login_manager.login_view = "login"
 
 @app.route('/test', methods =['POST'])
 def test():
-    
-    #s.sendall(request.json['name'].encode())
     import socket
     import json   
     import sys
