@@ -190,7 +190,7 @@ function reles(data, ip){ //consulta el estado de los relevadores
     axios.post('/reles', queryObj).then(
         (response) => {
           var result = response.data;
-         // console.log(result);
+          console.log(result);
          //  for(var k in result) {
            //     console.log(k, result[k]);
            //    }
@@ -224,7 +224,12 @@ function reles(data, ip){ //consulta el estado de los relevadores
         document.getElementById('cargando_reles').className = '';
         },
         (error) => {
-            error('Ocurrio un error');
+            $('#modal_reles').modal('hide');
+            Swal.fire({
+                    icon: 'error',
+                    title: 'Ocurrio un error',
+                    //text: '',
+                });
             console.log(error);
         }
     );
@@ -325,6 +330,7 @@ function reles(data, ip){ //consulta el estado de los relevadores
                 document.getElementById('cargando_editar').className = '';    
             },
             (error) => {
+                $('#modal_editar_reles').modal('hide');
                 Swal.fire({
                     icon: 'error',
                     title: 'Ocurrio un error',
