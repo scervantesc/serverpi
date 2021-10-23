@@ -11,21 +11,23 @@
                         <th class="text-center">Dirección IP</th>
                         <th class="text-center">Puerto</th>
                         <th class="text-center">Descripción</th>
-                        <th></th>
+                        <th class="text-center">Relevadores</th>
                         <th class="text-center">Editar</th>
+                        <th class="text-center">Tareas</th>
                     </tr>
                 </thead>
                 <tbody class=""> 
                 {% for equipo in raspberrys %} 
-                    <tr>
-                        <td class="">{{equipo.Nombre}}</td>
-                        <td class="text-center">{{equipo.IP}}</td>
-                        <td class="text-center">{{equipo.Puerto}}</td>
-                        <td class="text-center">{{equipo.Descripcion}}</td>
-                        <td class="text-center"><button type="button" class="btn btn-success btn-sm" onclick="reles('{{equipo.Nombre}}','{{equipo.IP}}')" id="{{equipo.id}}">Relevadores</button></td>
-                        <td class="text-center">
+                    <tr class="text-sm ">
+                        <td class="align-middle">{{equipo.Nombre}}</td>
+                        <td class="text-center align-middle">{{equipo.IP}}</td>
+                        <td class="text-center align-middle">{{equipo.Puerto}}</td>
+                        <td class="text-center align-middle">{{equipo.Descripcion}}</td>
+                        <td class="text-center align-middle"><button type="button" class="btn btn-outline-primary border-0" onclick="reles('{{equipo.Nombre}}','{{equipo.IP}}')" id="{{equipo.id}}"><i class="fas fa-sitemap" style="font-size:20px;"></i></button></td>
+                        <td class="text-center align-middle">
                             <button type="button" class="btn btn-outline-primary border-0" id="{{equipo.IP}}" onclick="editarRelay('{{equipo.IP}}','{{equipo.Nombre}}')"><i class="fas fa-edit" style="font-size:20px;"></i></button>
                         </td>
+                        <td class="text-center align-middle"><button type="button" class="btn  btn-outline-primary border-0"><i class="far fa-calendar-alt" style="font-size:20px;"></i></button></td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -60,10 +62,9 @@
                 <table class="table table-bordered table-sm">
                     <thead class="table-dark">
                          <tr class="d-flex">
-                        <th class="text-center col-4">Nombre</th>
+                        <th class="text-center col-7">Nombre</th>
                         <th class="text-center col-2">Pin</th>
                         <th class="text-center col-3">Estatus</th>
-                        <th class="text-center col-3 text-sm-sm">Tareas</th>
                         </tr>
                     </thead>
                     <tbody id="tablebodylol">
@@ -190,7 +191,7 @@ function reles(data, ip){ //consulta el estado de los relevadores
     axios.post('/reles', queryObj).then(
         (response) => {
           var result = response.data;
-          console.log(result);
+          //console.log(result);
          //  for(var k in result) {
            //     console.log(k, result[k]);
            //    }
@@ -199,8 +200,9 @@ function reles(data, ip){ //consulta el estado de los relevadores
         let tableText = "";
             for(var k in result) {
                 var array = result[k].split(",");
+            //    console.log(array);
                 tableText += "<tr class='d-flex'>";
-                tableText += "<td class='col-4'>"+k+"</td>"; //nombre del pin
+                tableText += "<td class='col-7 pl-2'>"+k+"</td>"; //nombre del pin
                 tableText += "<td class='text-center col-2'>"+array[0]+"</td>"; //pin
                 tableText += '<td class="d-flex justify-content-center col-3"><div class="">'+
                                     '<div class="onoffswitch">';
@@ -216,7 +218,7 @@ function reles(data, ip){ //consulta el estado de los relevadores
                                         '</label>'+
                                     '</div>'+
                                 '</div></td>';
-                tableText += '<td class="text-center col-3"><button type="button" class="btn  btn-outline-primary border-0"><i class="far fa-calendar-alt" style="font-size:20px;"></i></button></td>';
+                //tableText += '<td class="text-center col-3"><button type="button" class="btn  btn-outline-primary border-0"><i class="far fa-calendar-alt" style="font-size:20px;"></i></button></td>';
                 tableText += "</tr>";
             }
         document.getElementById('tablebodylol').innerHTML = tableText;
