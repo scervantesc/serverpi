@@ -105,6 +105,13 @@ def paramiko():
     if request.json['comando'] == 'reboot':
         return 'ok'
     return format(dato)
+
+#Tareas programadas
+@app.route('/tareas', methods=['GET','POST'])
+@login_required
+def tareas():
+    return render_template('tareas.html')
+    
     
 #cambio rele manual
 @app.route('/change_relay', methods=['POST'])
